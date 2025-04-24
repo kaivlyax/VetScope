@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database/vetscope.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -22,11 +22,18 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 # Load the model if available
-MODEL_PATH = 'models/dog_disease_model.h5'
+MODEL_PATH = os.getenv('MODEL_PATH', 'models/dog_disease_model.h5')
 model = None
+
+# Suppress TensorFlow warnings
+tf.get_logger().setLevel('ERROR')
+
 try:
     if os.path.exists(MODEL_PATH):
         model = tf.keras.models.load_model(MODEL_PATH)
+        print(f"Model loaded successfully from {MODEL_PATH}")
+    else:
+        print(f"Model file not found at {MODEL_PATH}")
 except Exception as e:
     print(f"Error loading model: {e}")
 
@@ -156,4 +163,5 @@ def predict():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True) 
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port) 
