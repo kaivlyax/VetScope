@@ -5,8 +5,8 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       mkdir -p /opt/render/project/src/models
-      # Download model file from Google Drive
-      curl -L -o /opt/render/project/src/models/dog_disease_model.h5 "https://drive.google.com/uc?export=download&id=1dh2J-arVsnBJA7xVRZP9r1e4x8qPUeAc"
+      # Download model file from Google Drive using wget with cookies
+      wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1dh2J-arVsnBJA7xVRZP9r1e4x8qPUeAc' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1dh2J-arVsnBJA7xVRZP9r1e4x8qPUeAc" -O /opt/render/project/src/models/dog_disease_model.h5 && rm -rf /tmp/cookies.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
