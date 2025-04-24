@@ -6,10 +6,14 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/vetscope.db'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database/vetscope.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize extensions
@@ -17,9 +21,14 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# Load the model
+# Load the model if available
 MODEL_PATH = 'models/dog_disease_model.h5'
-model = tf.keras.models.load_model(MODEL_PATH)
+model = None
+try:
+    if os.path.exists(MODEL_PATH):
+        model = tf.keras.models.load_model(MODEL_PATH)
+except Exception as e:
+    print(f"Error loading model: {e}")
 
 # Define disease information
 DISEASE_INFO = {
@@ -98,7 +107,7 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', model_available=model is not None)
 
 def preprocess_image(image):
     img = Image.open(image)
@@ -110,6 +119,12 @@ def preprocess_image(image):
 @app.route('/predict', methods=['POST'])
 @login_required
 def predict():
+    if model is None:
+        return jsonify({
+            'error': 'Model not available. Please contact support.',
+            'status': 'maintenance'
+        }), 503
+    
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'})
     

@@ -6,6 +6,14 @@
 <div class="dashboard-container">
     <h1 class="text-center mb-4">Welcome, {{ current_user.name }}!</h1>
     
+    {% if not model_available %}
+    <div class="alert alert-warning text-center" role="alert">
+        <h4 class="alert-heading">Service Temporarily Unavailable</h4>
+        <p>Our AI model is currently undergoing maintenance. Please try again later.</p>
+        <p>We apologize for any inconvenience.</p>
+    </div>
+    {% endif %}
+    
     <div class="row">
         <div class="col-md-6 mx-auto">
             <div class="upload-section card">
@@ -13,11 +21,11 @@
                     <h2 class="card-title text-center mb-4">Upload Image</h2>
                     <form id="uploadForm" class="text-center">
                         <div class="upload-area mb-4" id="dropZone">
-                            <input type="file" id="imageInput" class="d-none" accept="image/*">
+                            <input type="file" id="imageInput" class="d-none" accept="image/*" {% if not model_available %}disabled{% endif %}>
                             <div class="upload-placeholder">
                                 <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
                                 <p>Drag and drop your image here or</p>
-                                <button type="button" class="btn btn-primary" onclick="document.getElementById('imageInput').click()">
+                                <button type="button" class="btn btn-primary" onclick="document.getElementById('imageInput').click()" {% if not model_available %}disabled{% endif %}>
                                     Choose File
                                 </button>
                             </div>
@@ -25,7 +33,7 @@
                                 <img id="imagePreview" class="img-fluid rounded" alt="Preview">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success btn-lg">Analyze Image</button>
+                        <button type="submit" class="btn btn-success btn-lg" {% if not model_available %}disabled{% endif %}>Analyze Image</button>
                     </form>
                 </div>
             </div>
@@ -75,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('uploadForm');
     const resultsSection = document.getElementById('resultsSection');
 
+    {% if model_available %}
     // Drag and drop handlers
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -129,6 +138,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data.error) {
+                if (data.status === 'maintenance') {
+                    location.reload();
+                    return;
+                }
                 alert(data.error);
                 return;
             }
@@ -154,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(error);
         }
     });
+    {% endif %}
 });
 </script>
 {% endblock %} 
