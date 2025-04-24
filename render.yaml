@@ -5,9 +5,8 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       mkdir -p /opt/render/project/src/models
-      if [ -f models/dog_disease_model.h5 ]; then
-        cp models/dog_disease_model.h5 /opt/render/project/src/models/
-      fi
+      # Download model file from Google Drive
+      curl -L -o /opt/render/project/src/models/dog_disease_model.h5 "https://drive.google.com/uc?export=download&id=1dh2J-arVsnBJA7xVRZP9r1e4x8qPUeAc"
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
