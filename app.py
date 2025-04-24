@@ -33,7 +33,8 @@ def load_model_safely():
     try:
         # Convert relative path to absolute path
         abs_model_path = os.path.abspath(MODEL_PATH)
-        print(f"Attempting to load model from: {abs_model_path}")
+        print(f"Environment MODEL_PATH: {MODEL_PATH}")
+        print(f"Absolute model path: {abs_model_path}")
         print(f"Current working directory: {os.getcwd()}")
         
         # Check if directory exists
@@ -58,6 +59,8 @@ def load_model_safely():
         print(f"Error loading model: {e}")
         print(f"Model path: {MODEL_PATH}")
         print(f"Absolute path: {abs_model_path}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Directory contents: {os.listdir(os.path.dirname(abs_model_path))}")
         return False
 
 # Try to load the model
