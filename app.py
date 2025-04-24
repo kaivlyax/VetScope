@@ -35,7 +35,14 @@ def load_model_safely():
         abs_model_path = os.path.abspath(MODEL_PATH)
         print(f"Attempting to load model from: {abs_model_path}")
         print(f"Current working directory: {os.getcwd()}")
-        print(f"Directory contents: {os.listdir(os.path.dirname(abs_model_path))}")
+        
+        # Check if directory exists
+        model_dir = os.path.dirname(abs_model_path)
+        if not os.path.exists(model_dir):
+            print(f"Creating directory: {model_dir}")
+            os.makedirs(model_dir, exist_ok=True)
+        
+        print(f"Directory contents: {os.listdir(model_dir)}")
         
         if os.path.exists(abs_model_path):
             print(f"Model file exists at {abs_model_path}")
@@ -45,7 +52,7 @@ def load_model_safely():
             return True
         else:
             print(f"Model file not found at {abs_model_path}")
-            print(f"Directory contents: {os.listdir(os.path.dirname(abs_model_path))}")
+            print(f"Directory contents: {os.listdir(model_dir)}")
             return False
     except Exception as e:
         print(f"Error loading model: {e}")
