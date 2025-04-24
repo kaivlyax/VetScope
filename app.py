@@ -29,13 +29,21 @@ model = None
 tf.get_logger().setLevel('ERROR')
 
 try:
-    if os.path.exists(MODEL_PATH):
-        model = tf.keras.models.load_model(MODEL_PATH)
-        print(f"Model loaded successfully from {MODEL_PATH}")
+    # Convert relative path to absolute path
+    abs_model_path = os.path.abspath(MODEL_PATH)
+    print(f"Attempting to load model from: {abs_model_path}")
+    
+    if os.path.exists(abs_model_path):
+        model = tf.keras.models.load_model(abs_model_path)
+        print(f"Model loaded successfully from {abs_model_path}")
     else:
-        print(f"Model file not found at {MODEL_PATH}")
+        print(f"Model file not found at {abs_model_path}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Directory contents: {os.listdir(os.path.dirname(abs_model_path))}")
 except Exception as e:
     print(f"Error loading model: {e}")
+    print(f"Model path: {MODEL_PATH}")
+    print(f"Absolute path: {abs_model_path}")
 
 # Define disease information
 DISEASE_INFO = {
