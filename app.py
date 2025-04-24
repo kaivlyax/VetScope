@@ -22,7 +22,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 # Load the model if available
-MODEL_PATH = os.getenv('MODEL_PATH', 'models/dog_disease_model.h5')
+MODEL_PATH = os.getenv('MODEL_PATH', '/opt/render/project/src/models/dog_disease_model_96.h5')
 model = None
 
 # Suppress TensorFlow warnings
